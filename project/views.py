@@ -1,0 +1,49 @@
+from django.shortcuts import render, redirect,get_object_or_404
+from django.http import HttpResponse, FileResponse
+from django.template import loader
+from django import forms
+import yt_dlp
+import base64
+from pathlib import Path
+
+
+def test(request):
+    if request.method == 'POST':
+        form = URLForm(request.POST)
+        url = str()
+        if form.is_valid():
+            url = request.POST.get('url', '')
+            print(url)
+            # Redirect to a new URL:
+            #return redirect('student_course')
+            data = download(url)
+            print(data)
+            video_path = f'/static/{data[0]}'
+            file_name = data[1]
+
+            return render(request, 'downloadfile.html', {'video_path': video_path, 'file_name': file_name})
+
+    else:
+        # Display the form for the first time
+        form = URLForm()
+
+    # Render the HTML template with the form
+    return render(request, 'download.html', {'form': form})
+
+class URLForm(forms.Form):
+    # Define your form fields here
+    url = forms.CharField(label='URL', max_length=1000)
+
+def download(url: str):
+    config = dict()
+    # get title
+    with yt_dlp.YoutubeDL() as dlp:
+        title = dlp.sanitize_info(dlp.extract_info(url, download=False))['title']
+        file = str(base64.b64encode(bytes(title, encoding='utf-8')))[2:]
+        config['outtmpl'] = {'default': f'project/static/{file}'}
+
+    # download
+    with yt_dlp.YoutubeDL(config) as dlp:
+        dlp.download([url])
+    return [f"{file}.webm", f"{title}.webm"]
+
