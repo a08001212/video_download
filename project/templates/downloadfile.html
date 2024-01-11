@@ -3,13 +3,17 @@
 
 <html>
 <head>
-    <title>Start Auto Download file</title>
+    <title>download file</title>
 
 </head>
 <body>
 <div class="wrapper">
-    <p>The download should start shortly. If it doesn't, click
-    <a href="{{ video_path }}" download="filename">here</a>.</p>
+    <h1>click 
+    <a href="{{ video_path }}" download="範例.pdf" >here</a> to download video.</h1>
+
+    <video width="500" height="375" controls>
+        <source src="{{ video_path }}">
+    </video>
 </div>
 
 </body>
